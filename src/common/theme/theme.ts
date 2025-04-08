@@ -1,4 +1,4 @@
-import type { ThemeMode } from "@/app/app-reducer"
+import type { ThemeMode } from "@/app/app-slice.ts"
 import { createTheme } from "@mui/material/styles"
 
 export const getTheme = (themeMode: ThemeMode) => {
@@ -6,7 +6,7 @@ export const getTheme = (themeMode: ThemeMode) => {
     palette: {
       mode: themeMode,
       primary: {
-        main: "#087EA4",
+        main: "rgba(40,91,41,0.88)",
       },
     },
   })
