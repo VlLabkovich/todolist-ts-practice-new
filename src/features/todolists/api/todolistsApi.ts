@@ -2,8 +2,11 @@ import { instance } from "@/common/instance"
 import type { BaseResponse } from "@/common/types"
 import type { Todolist } from "./todolistsApi.types"
 
+
 export const todolistsApi = {
+  // 3
   getTodolists() {
+    // 4
     return instance.get<Todolist[]>("/todo-lists")
   },
   changeTodolistTitle(payload: { id: string; title: string }) {
