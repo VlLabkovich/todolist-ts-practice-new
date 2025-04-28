@@ -1,6 +1,6 @@
+import { createAppSlice } from "@/common/utils"
 import { todolistsApi } from "@/features/todolists/api/todolistsApi.ts"
 import type { Todolist } from "@/features/todolists/api/todolistsApi.types.ts"
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit"
 
 export type DomainTodolist = Todolist & {
   filter: FilterValues
@@ -8,7 +8,7 @@ export type DomainTodolist = Todolist & {
 
 export type FilterValues = "all" | "active" | "completed"
 
-export const todolistsSlice = createSlice({
+export const todolistsSlice = createAppSlice({
   name: "todolists",
   initialState: [] as DomainTodolist[],
   reducers: (create) => ({
@@ -18,88 +18,161 @@ export const todolistsSlice = createSlice({
         todolistFilter.filter = action.payload.filter
       }
     }),
-  }),
-  extraReducers: (builder) => {
-    builder
-      .addCase(fetchTodolistsTC.fulfilled, (state, action) => {
-        action.payload?.todolists.forEach((tl) => {
-          state.push({ ...tl, filter: "all" })
-        })
-      })
-      // .addCase(setTodolistsTC.rejected, (state, action) => {})
 
-      .addCase(changeTodolistTitleTC.fulfilled, (state, action) => {
-        const index = state.findIndex((todolist) => todolist.id === action.payload.id)
-        if (index !== -1) {
-          state[index].title = action.payload.title
+    fetchTodolistsTC: create.asyncThunk(
+      async (_, thunkAPI) => {
+        try {
+          const res = await todolistsApi.getTodolists()
+          return { todolists: res.data }
+        } catch (error) {
+          return thunkAPI.rejectWithValue(null)
         }
-      })
-      // .addCase(changeTodolistTitleTC.rejected, (state, action) => {})
+      },
+      {
+        fulfilled: (state, action) => {
+          action.payload?.todolists.forEach((tl) => {
+            state.push({ ...tl, filter: "all" })
+          })
+        },
+      },
+    ),
 
-      .addCase(createTodolistTC.fulfilled, (state, action) => {
-        state.unshift({ ...action.payload.todolist, filter: "all" })
-      })
+    changeTodolistTitleTC: create.asyncThunk(
+      async (payload: { id: string; title: string }, thunkAPI) => {
+        try {
+          await todolistsApi.changeTodolistTitle(payload)
+          return payload
+        } catch (error) {
+          return thunkAPI.rejectWithValue(null)
+        }
+      },
+      {
+        fulfilled: (state, action) => {
+          const index = state.findIndex((todolist) => todolist.id === action.payload.id)
+          if (index !== -1) {
+            state[index].title = action.payload.title
+          }
+        },
+      },
+    ),
 
-      .addCase(deleteTodolistTC.fulfilled, (state, action) => {
-        const index = state.findIndex((todo) => todo.id === action.payload.id)
-        if (index !== -1) state.splice(index, 1)
-      })
-  },
+    createTodolistTC: create.asyncThunk(
+      async (title: string, thunkAPI) => {
+        try {
+          const res = await todolistsApi.createTodolist(title)
+          return { todolist: res.data.data.item }
+        } catch (error) {
+          return thunkAPI.rejectWithValue(null)
+        }
+      },
+      {
+        fulfilled: (state, action) => {
+          state.unshift({ ...action.payload.todolist, filter: "all" })
+        },
+      },
+    ),
+
+    deleteTodolistTC: create.asyncThunk(
+      async (id: string, thunkAPI) => {
+        try {
+          await todolistsApi.deleteTodolist(id)
+          return { id }
+        } catch (error) {
+          return thunkAPI.rejectWithValue(null)
+        }
+      },
+      {
+        fulfilled: (state, action) => {
+          const index = state.findIndex((todo) => todo.id === action.payload.id)
+          if (index !== -1) state.splice(index, 1)
+        },
+      },
+    ),
+  }),
+  // extraReducers: (builder) => {
+  //   builder
+  //     // .addCase(fetchTodolistsTC.fulfilled, (state, action) => {
+  //     //   action.payload?.todolists.forEach((tl) => {
+  //     //     state.push({ ...tl, filter: "all" })
+  //     //   })
+  //     // })
+  //     // .addCase(setTodolistsTC.rejected, (state, action) => {})
+  //
+  //     // .addCase(changeTodolistTitleTC.fulfilled, (state, action) => {
+  //     //   const index = state.findIndex((todolist) => todolist.id === action.payload.id)
+  //     //   if (index !== -1) {
+  //     //     state[index].title = action.payload.title
+  //     //   }
+  //     // })
+  //     // .addCase(changeTodolistTitleTC.rejected, (state, action) => {})
+  //
+  //     // .addCase(createTodolistTC.fulfilled, (state, action) => {
+  //     //   state.unshift({ ...action.payload.todolist, filter: "all" })
+  //     // })
+  //
+  //     // .addCase(deleteTodolistTC.fulfilled, (state, action) => {
+  //     //   const index = state.findIndex((todo) => todo.id === action.payload.id)
+  //     //   if (index !== -1) state.splice(index, 1)
+  //     // })
+  // },
 
   selectors: {
     selectTodolists: (state) => state,
   },
 })
 
-export const fetchTodolistsTC = createAsyncThunk(`${todolistsSlice.name}/setTodolistsTC`, async (_arg, thunkAPI) => {
-  try {
-    const res = await todolistsApi.getTodolists()
-    return { todolists: res.data }
-  } catch (error) {
-    return thunkAPI.rejectWithValue(null)
-  }
-})
+// // old
 
-export const changeTodolistTitleTC = createAsyncThunk(
-  `${todolistsSlice.name}/changeTodolistTitleTC`,
-  async (payload: { id: string; title: string }, thunkAPI) => {
-    try {
-      await todolistsApi.changeTodolistTitle(payload)
-      return payload
-    } catch (error) {
-      return thunkAPI.rejectWithValue(null)
-    }
-  },
-)
+// export const fetchTodolistsTC = createAsyncThunk(`${todolistsSlice.name}/setTodolistsTC`, async (_arg, thunkAPI) => {
+//   try {
+//     const res = await todolistsApi.getTodolists()
+//     return { todolists: res.data }
+//   } catch (error) {
+//     return thunkAPI.rejectWithValue(null)
+//   }
+// })
 
-export const createTodolistTC = createAsyncThunk(
-  `${todolistsSlice.name}/createTodolistTC`,
-  async (title: string, thunkAPI) => {
-    try {
-      const res = await todolistsApi.createTodolist(title)
-      return { todolist: res.data.data.item }
-    } catch (error) {
-      return thunkAPI.rejectWithValue(null)
-    }
-  },
-)
+// export const changeTodolistTitleTC = createAsyncThunk(
+//   `${todolistsSlice.name}/changeTodolistTitleTC`,
+//   async (payload: { id: string; title: string }, thunkAPI) => {
+//     try {
+//       await todolistsApi.changeTodolistTitle(payload)
+//       return payload
+//     } catch (error) {
+//       return thunkAPI.rejectWithValue(null)
+//     }
+//   },
+// )
+
+// export const createTodolistTC = createAsyncThunk(
+//   `${todolistsSlice.name}/createTodolistTC`,
+//   async (title: string, thunkAPI) => {
+//     try {
+//       const res = await todolistsApi.createTodolist(title)
+//       return { todolist: res.data.data.item }
+//     } catch (error) {
+//       return thunkAPI.rejectWithValue(null)
+//     }
+//   },
+// )
 
 // todolistsApi.changeTodolistTitle({ id, title }).then(() => {
 //       setTodolists(todolists.map((todolist) => (todolist.id === id ? { ...todolist, title } : todolist)))
 
-export const deleteTodolistTC = createAsyncThunk(
-  `${todolistsSlice.name}/deleteTodolistTC`,
-  async (id: string, thunkAPI) => {
-    try {
-      await todolistsApi.deleteTodolist(id)
-      return { id }
-    } catch (error) {
-      return thunkAPI.rejectWithValue(null)
-    }
-  },
-)
+// export const deleteTodolistTC = createAsyncThunk(
+//   `${todolistsSlice.name}/deleteTodolistTC`,
+//   async (id: string, thunkAPI) => {
+//     try {
+//       await todolistsApi.deleteTodolist(id)
+//       return { id }
+//     } catch (error) {
+//       return thunkAPI.rejectWithValue(null)
+//     }
+//   },
+// )
 
-export const { changeTodolistFilterAC } = todolistsSlice.actions
+export const { fetchTodolistsTC, changeTodolistTitleTC, deleteTodolistTC, createTodolistTC, changeTodolistFilterAC } =
+  todolistsSlice.actions
 export const { selectTodolists } = todolistsSlice.selectors
 export const todolistsReducer = todolistsSlice.reducer
 
