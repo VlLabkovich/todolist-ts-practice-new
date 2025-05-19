@@ -1,10 +1,12 @@
 import { setAppStatusAC } from "@/app/app-slice.ts"
+import type { RequestStatus } from "@/common/types"
 import { createAppSlice } from "@/common/utils"
 import { todolistsApi } from "@/features/todolists/api/todolistsApi.ts"
 import type { Todolist } from "@/features/todolists/api/todolistsApi.types.ts"
 
 export type DomainTodolist = Todolist & {
-  filter: FilterValues
+  filter: FilterValues,
+  entityStatus: RequestStatus
 }
 
 export type FilterValues = "all" | "active" | "completed"
@@ -19,6 +21,13 @@ export const todolistsSlice = createAppSlice({
         todolistFilter.filter = action.payload.filter
       }
     }),
+    changeTodolistStatusAC: create.reducer<{id: string, entityStatus: RequestStatus}>((state, action) => {
+      const todolistStatus = state.findIndex(todo => todo.id === action.payload.id)
+      if(todolistStatus !== -1) {
+        state[todolistStatus].entityStatus = action.payload.entityStatus
+      }
+    }),
+
 
     fetchTodolistsTC: create.asyncThunk(
       async (_, { dispatch, rejectWithValue }) => {
@@ -35,7 +44,7 @@ export const todolistsSlice = createAppSlice({
       {
         fulfilled: (state, action) => {
           action.payload?.todolists.forEach((tl) => {
-            state.push({ ...tl, filter: "all" })
+            state.push({ ...tl, filter: "all", entityStatus: "idle" })
           })
         },
       },
@@ -77,7 +86,7 @@ export const todolistsSlice = createAppSlice({
       },
       {
         fulfilled: (state, action) => {
-          state.unshift({ ...action.payload.todolist, filter: "all" })
+          state.unshift({ ...action.payload.todolist, filter: "all", entityStatus: "idle" })
         },
       },
     ),
@@ -86,6 +95,7 @@ export const todolistsSlice = createAppSlice({
       async (id: string, { dispatch, rejectWithValue }) => {
         try {
           dispatch(setAppStatusAC({ status: "loading" }))
+          dispatch(changeTodolistStatusAC({id, entityStatus: "loading"}))
           await todolistsApi.deleteTodolist(id)
           dispatch(setAppStatusAC({ status: "succeeded" }))
           return { id }
@@ -109,7 +119,8 @@ export const todolistsSlice = createAppSlice({
   },
 })
 
-export const { fetchTodolistsTC, changeTodolistTitleTC, deleteTodolistTC, createTodolistTC, changeTodolistFilterAC } =
+export const { fetchTodolistsTC, changeTodolistTitleTC, deleteTodolistTC, createTodolistTC, changeTodolistFilterAC,
+  changeTodolistStatusAC} =
   todolistsSlice.actions
 export const { selectTodolists } = todolistsSlice.selectors
 export const todolistsReducer = todolistsSlice.reducer
