@@ -17,12 +17,12 @@ export const appSlice = createSlice({
     }),
     setAppErrorAC: create.reducer<{ error: null | string }>((state, action) => {
       state.error = action.payload.error
-    })
+    }),
   }),
   selectors: {
     selectThemeMode: (state) => state.themeMode,
     selectStatus: (state) => state.status,
-    selectAppError:  (state) => state.error
+    selectAppError: (state) => state.error,
   },
 })
 
