@@ -38,8 +38,6 @@ export const todolistsSlice = createAppSlice({
           return { todolists: res.data }
         } catch (error) {
           handleServerNetworkError(dispatch, error)
-          dispatch(setAppStatusAC({ status: "failed" }))
-          // dispatch(setAppErrorAC({ error: "Ошибка получения тудулистов!"}))
           return rejectWithValue(null)
         }
       },
@@ -92,7 +90,6 @@ export const todolistsSlice = createAppSlice({
             return rejectWithValue(null)
           }
         } catch (error) {
-          dispatch(setAppStatusAC({ status: "failed" }))
           handleServerNetworkError(dispatch, error)
           return rejectWithValue(null)
         }
@@ -114,13 +111,11 @@ export const todolistsSlice = createAppSlice({
           if (res.data.resultCode === ResultCode.Success) {
             return { id }
           } else {
-            dispatch(setAppStatusAC({ status: "failed" }))
             handleServerAppError(res.data, dispatch)
             return rejectWithValue(null)
           }
         } catch (error) {
           dispatch(changeTodolistStatusAC({ id, entityStatus: "failed" }))
-          dispatch(setAppStatusAC({ status: "failed" }))
           handleServerNetworkError(dispatch, error)
           return rejectWithValue(null)
         }

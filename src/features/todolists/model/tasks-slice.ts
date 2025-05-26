@@ -52,7 +52,6 @@ export const tasksSlice = createAppSlice({
             dispatch(setAppStatusAC({ status: "succeeded" }))
             return { task: res.data.data.item }
           } else {
-            dispatch(setAppStatusAC({ status: "failed" }))
             handleServerAppError(res.data, dispatch)
             return rejectWithValue(null)
           }
@@ -78,13 +77,11 @@ export const tasksSlice = createAppSlice({
           if (res.data.resultCode === ResultCode.Success) {
             return payload
           } else {
-            dispatch(setAppStatusAC({ status: "failed" }))
             handleServerAppError(res.data, dispatch)
             return rejectWithValue(null)
           }
 
         } catch (error) {
-          dispatch(setAppStatusAC({ status: "failed" }))
           handleServerNetworkError(dispatch, error)
           return rejectWithValue(null)
         }
@@ -135,7 +132,6 @@ export const tasksSlice = createAppSlice({
             return rejectWithValue(null)
           }
         } catch (error) {
-          // debugger
           handleServerNetworkError(dispatch, error)
           return rejectWithValue(null)
         }
