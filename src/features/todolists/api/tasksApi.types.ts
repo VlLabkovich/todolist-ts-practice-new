@@ -1,16 +1,26 @@
-import type { TaskPriority, TaskStatus } from "@/common/enums/enums"
+import { TaskPriority, TaskStatus } from "@/common/enums"
+import { z } from "zod"
 
-export type DomainTask = {
-  description: string
+export const DomainTaskSchema = z.object({
+  description: z.string().nullable(),
+  title: z.string(),
+  status: z.nativeEnum(TaskStatus),
+  priority: z.nativeEnum(TaskPriority),
+  startDate: z.string().nullable(),
+  deadline: z.string().nullable(),
+  id: z.string(),
+  todoListId: z.string(),
+  order: z.number(),
+  addedDate: z.string().datetime({local: true}),
+})
+
+export type UpdateTaskModel = {
+  description: string | null
   title: string
   status: TaskStatus
   priority: TaskPriority
-  startDate: string
-  deadline: string
-  id: string
-  todoListId: string
-  order: number
-  addedDate: string
+  startDate: string | null
+  deadline: string | null
 }
 
 export type GetTasksResponse = {
@@ -19,11 +29,4 @@ export type GetTasksResponse = {
   items: DomainTask[]
 }
 
-export type UpdateTaskModel = {
-  description: string
-  title: string
-  status: TaskStatus
-  priority: TaskPriority
-  startDate: string
-  deadline: string
-}
+export type DomainTask = z.infer<typeof DomainTaskSchema>

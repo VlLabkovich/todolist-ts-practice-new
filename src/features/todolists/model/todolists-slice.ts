@@ -3,7 +3,7 @@ import { ResultCode } from "@/common/enums"
 import type { RequestStatus } from "@/common/types"
 import { createAppSlice, handleServerAppError, handleServerNetworkError } from "@/common/utils"
 import { todolistsApi } from "@/features/todolists/api/todolistsApi.ts"
-import type { Todolist } from "@/features/todolists/api/todolistsApi.types.ts"
+import { type Todolist, TodolistSchema } from "@/features/todolists/api/todolistsApi.types.ts"
 
 export type DomainTodolist = Todolist & {
   filter: FilterValues
@@ -17,7 +17,7 @@ export const todolistsSlice = createAppSlice({
   initialState: [] as DomainTodolist[],
   reducers: (create) => ({
     changeTodolistFilterAC: create.reducer<{ id: string; filter: FilterValues }>((state, action) => {
-      const todolistFilter = state.find((todo) => todo.id === action.payload.id)
+      const todolistFilter = state.find((todo: { id: string }) => todo.id === action.payload.id)
       if (todolistFilter) {
         todolistFilter.filter = action.payload.filter
       }
@@ -35,8 +35,10 @@ export const todolistsSlice = createAppSlice({
           dispatch(setAppStatusAC({ status: "loading" }))
           const res = await todolistsApi.getTodolists()
           dispatch(setAppStatusAC({ status: "succeeded" }))
-          return { todolists: res.data }
+          const todolists = TodolistSchema.array().parse(res.data)
+          return { todolists }
         } catch (error) {
+          console.log(error)
           handleServerNetworkError(dispatch, error)
           return rejectWithValue(null)
         }

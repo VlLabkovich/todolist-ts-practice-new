@@ -1,6 +1,9 @@
 import { selectThemeMode } from "@/app/app-slice"
 import { useAppSelector } from "@/common/hooks"
 import { getTheme } from "@/common/theme"
+import { loginSchema } from "@/features/auth/lib/schemas"
+import type { Inputs } from "@/features/auth/lib/schemas/loginSchema.ts"
+import { zodResolver } from "@hookform/resolvers/zod"
 import Button from "@mui/material/Button"
 import Checkbox from "@mui/material/Checkbox"
 import FormControl from "@mui/material/FormControl"
@@ -12,12 +15,6 @@ import TextField from "@mui/material/TextField"
 import { Controller, type SubmitHandler, useForm } from "react-hook-form"
 import styles from "./Login.module.css"
 
-type Inputs = {
-  email: string
-  password: string
-  rememberMe: boolean
-}
-
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode)
   const theme = getTheme(themeMode)
@@ -28,7 +25,10 @@ export const Login = () => {
     reset,
     control,
     formState: { errors },
-  } = useForm<Inputs>({ defaultValues: { email: "", password: "", rememberMe: false } })
+  } = useForm<Inputs>({
+    defaultValues: { email: "", password: "", rememberMe: false },
+    resolver: zodResolver(loginSchema)
+  })
 
   const onSubmit: SubmitHandler<Inputs> = (data) => {
     console.log(data)
@@ -64,13 +64,7 @@ export const Login = () => {
               label="Email"
               margin="normal"
               error={!!errors.email}
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
-                  message: "Incorrect email address",
-                },
-              })}
+              {...register("email")}
             />
             {errors.email && <span className={styles.errorMessage}>{errors.email.message}</span>}
 
