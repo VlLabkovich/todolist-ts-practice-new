@@ -1,9 +1,10 @@
 import { selectThemeMode } from "@/app/app-slice"
-import { useAppSelector } from "@/common/hooks"
+import { useAppDispatch, useAppSelector } from "@/common/hooks"
+import { Path } from "@/common/routing"
 import { getTheme } from "@/common/theme"
 import { loginSchema } from "@/features/auth/lib/schemas"
-import type { Inputs } from "@/features/auth/lib/schemas/loginSchema.ts"
-import { zodResolver } from "@hookform/resolvers/zod"
+import type { LoginInputs } from "@/features/auth/lib/schemas/loginSchema.ts"
+import { loginTC, selectIsLoggedIn } from "@/features/auth/model/auth-slice.ts"
 import Button from "@mui/material/Button"
 import Checkbox from "@mui/material/Checkbox"
 import FormControl from "@mui/material/FormControl"
@@ -13,11 +14,15 @@ import FormLabel from "@mui/material/FormLabel"
 import Grid from "@mui/material/Grid2"
 import TextField from "@mui/material/TextField"
 import { Controller, type SubmitHandler, useForm } from "react-hook-form"
+import { Navigate } from "react-router"
 import styles from "./Login.module.css"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode)
   const theme = getTheme(themeMode)
+  const dispatch = useAppDispatch()
+  const isLoggedIn = useAppSelector(selectIsLoggedIn)
 
   const {
     register,
@@ -25,14 +30,18 @@ export const Login = () => {
     reset,
     control,
     formState: { errors },
-  } = useForm<Inputs>({
+  } = useForm<LoginInputs>({
     defaultValues: { email: "", password: "", rememberMe: false },
-    resolver: zodResolver(loginSchema)
+    resolver: zodResolver(loginSchema),
   })
 
-  const onSubmit: SubmitHandler<Inputs> = (data) => {
-    console.log(data)
+  const onSubmit: SubmitHandler<LoginInputs> = (data) => {
+    dispatch(loginTC(data))
     reset()
+  }
+
+  if(isLoggedIn) {
+    return <Navigate to={Path.Main}/>
   }
 
   return (
@@ -60,12 +69,7 @@ export const Login = () => {
             </p>
           </FormLabel>
           <FormGroup>
-            <TextField
-              label="Email"
-              margin="normal"
-              error={!!errors.email}
-              {...register("email")}
-            />
+            <TextField label="Email" margin="normal" error={!!errors.email} {...register("email")} />
             {errors.email && <span className={styles.errorMessage}>{errors.email.message}</span>}
 
             <TextField
