@@ -4,6 +4,9 @@ import type { LoginInputs } from "@/features/auth/lib/schemas/loginSchema.ts"
 
 export const authApi = {
   login(data: LoginInputs) {
-    return instance.post<BaseResponse<{ userId: number; token: string }>>('auth/login', data)
+    return instance.post<BaseResponse<{ userId: number; token: string }>>("auth/login", data)
+  },
+  logout() {
+    return instance.delete<BaseResponse>("auth/login")
   },
 }

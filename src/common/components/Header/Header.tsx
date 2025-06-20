@@ -3,6 +3,7 @@ import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { containerSx } from "@/common/styles"
 import { getTheme } from "@/common/theme"
 import { NavButton } from "@/common/components/NavButton/NavButton"
+import { logoutTC, selectIsLoggedIn } from "@/features/auth/model/auth-slice.ts"
 import MenuIcon from "@mui/icons-material/Menu"
 import { LinearProgress } from "@mui/material"
 import AppBar from "@mui/material/AppBar"
@@ -13,16 +14,20 @@ import Toolbar from "@mui/material/Toolbar"
 
 export const Header = () => {
   const themeMode = useAppSelector(selectThemeMode)
-
   const status = useAppSelector(selectStatus)
-
   const dispatch = useAppDispatch()
+  const isLoggedIn = useAppSelector(selectIsLoggedIn)
 
   const theme = getTheme(themeMode)
-
   const changeMode = () => {
     dispatch(changeThemeModeAC({ themeMode: themeMode === "light" ? "dark" : "light" }))
   }
+
+  const onclickLogoutHandler = () => {
+    dispatch(logoutTC())
+  }
+
+
 
   return (
     <AppBar position="static" sx={{ mb: "30px" }}>
@@ -32,8 +37,7 @@ export const Header = () => {
             <MenuIcon />
           </IconButton>
           <div>
-            <NavButton>Sign in</NavButton>
-            <NavButton>Sign up</NavButton>
+            {isLoggedIn && <NavButton onClick={onclickLogoutHandler}>Sign out</NavButton>}
             <NavButton background={theme.palette.primary.dark}>Faq</NavButton>
             <Switch color={"default"} onChange={changeMode} />
           </div>
