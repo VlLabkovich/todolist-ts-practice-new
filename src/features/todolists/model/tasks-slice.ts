@@ -1,5 +1,6 @@
 import { setAppStatusAC } from "@/app/app-slice.ts"
 import type { RootState } from "@/app/store.ts"
+import { clearDataAC } from "@/common/actions"
 import { ResultCode } from "@/common/enums"
 import { createAppSlice, handleServerAppError, handleServerNetworkError } from "@/common/utils"
 import { tasksApi } from "@/features/todolists/api/tasksApi.ts"
@@ -18,6 +19,9 @@ export const tasksSlice = createAppSlice({
       })
       .addCase(deleteTodolistTC.fulfilled, (state, action) => {
         delete state[action.payload.id]
+      })
+      .addCase(clearDataAC, () => {
+        return {}
       })
   },
   selectors: {
@@ -73,7 +77,7 @@ export const tasksSlice = createAppSlice({
       async (payload: { todolistId: string; taskId: string }, { dispatch, rejectWithValue }) => {
         try {
           dispatch(setAppStatusAC({ status: "loading" }))
-         const res = await tasksApi.deleteTask(payload)
+          const res = await tasksApi.deleteTask(payload)
           dispatch(setAppStatusAC({ status: "succeeded" }))
           if (res.data.resultCode === ResultCode.Success) {
             return payload
@@ -81,7 +85,6 @@ export const tasksSlice = createAppSlice({
             handleServerAppError(res.data, dispatch)
             return rejectWithValue(null)
           }
-
         } catch (error) {
           handleServerNetworkError(dispatch, error)
           return rejectWithValue(null)

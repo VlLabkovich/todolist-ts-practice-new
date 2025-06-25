@@ -1,4 +1,5 @@
 import { setAppStatusAC } from "@/app/app-slice.ts"
+import { clearDataAC } from "@/common/actions"
 import { ResultCode } from "@/common/enums"
 import type { RequestStatus } from "@/common/types"
 import { createAppSlice, handleServerAppError, handleServerNetworkError } from "@/common/utils"
@@ -15,6 +16,13 @@ export type FilterValues = "all" | "active" | "completed"
 export const todolistsSlice = createAppSlice({
   name: "todolists",
   initialState: [] as DomainTodolist[],
+
+  extraReducers: (builder) => {
+    builder.addCase(clearDataAC, () => {
+      return []
+    })
+  },
+
   reducers: (create) => ({
     changeTodolistFilterAC: create.reducer<{ id: string; filter: FilterValues }>((state, action) => {
       const todolistFilter = state.find((todo: { id: string }) => todo.id === action.payload.id)
