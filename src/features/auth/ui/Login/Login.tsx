@@ -13,8 +13,9 @@ import FormGroup from "@mui/material/FormGroup"
 import FormLabel from "@mui/material/FormLabel"
 import Grid from "@mui/material/Grid2"
 import TextField from "@mui/material/TextField"
+import { useEffect } from "react"
 import { Controller, type SubmitHandler, useForm } from "react-hook-form"
-import { Navigate } from "react-router"
+import { useNavigate } from "react-router"
 import styles from "./Login.module.css"
 import { zodResolver } from "@hookform/resolvers/zod"
 
@@ -23,6 +24,7 @@ export const Login = () => {
   const theme = getTheme(themeMode)
   const dispatch = useAppDispatch()
   const isLoggedIn = useAppSelector(selectIsLoggedIn)
+  const navigate = useNavigate()
 
   const {
     register,
@@ -40,9 +42,11 @@ export const Login = () => {
     reset()
   }
 
-  if(isLoggedIn) {
-    return <Navigate to={Path.Main}/>
-  }
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate(Path.Main)
+    }
+  }, [isLoggedIn])
 
   return (
     <Grid container justifyContent={"center"}>
