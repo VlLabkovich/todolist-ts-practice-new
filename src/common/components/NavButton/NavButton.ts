@@ -1,11 +1,16 @@
 import { styled } from "@mui/material/styles"
-import Button from "@mui/material/Button"
+import Button, { type ButtonProps } from "@mui/material/Button"
+import type { LinkProps } from "react-router"
 
-type Props = {
+type CustomProps  = {
   background?: string
 }
 
-export const NavButton = styled(Button)<Props>(({ background, theme }) => ({
+type Props = ButtonProps & CustomProps & Partial<LinkProps>
+
+export const NavButton = styled(Button, {
+  shouldForwardProp: (prop) => prop !== "background"
+})<Props>(({ background, theme }) => ({
   minWidth: "110px",
   fontWeight: "bold",
   boxShadow: `0 0 0 2px ${theme.palette.primary.dark}, 4px 4px 0 0 ${theme.palette.primary.dark}`,

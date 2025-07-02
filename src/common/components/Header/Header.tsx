@@ -1,8 +1,9 @@
 import { changeThemeModeAC, selectStatus, selectThemeMode } from "@/app/app-slice.ts"
+import { clearDataAC } from "@/common/actions"
+import { NavButton } from "@/common/components/NavButton/NavButton"
 import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { containerSx } from "@/common/styles"
 import { getTheme } from "@/common/theme"
-import { NavButton } from "@/common/components/NavButton/NavButton"
 import { logoutTC, selectIsLoggedIn } from "@/features/auth/model/auth-slice.ts"
 import MenuIcon from "@mui/icons-material/Menu"
 import { LinearProgress } from "@mui/material"
@@ -11,6 +12,7 @@ import Container from "@mui/material/Container"
 import IconButton from "@mui/material/IconButton"
 import Switch from "@mui/material/Switch"
 import Toolbar from "@mui/material/Toolbar"
+import { Link } from "react-router"
 
 export const Header = () => {
   const themeMode = useAppSelector(selectThemeMode)
@@ -27,7 +29,9 @@ export const Header = () => {
     dispatch(logoutTC())
   }
 
-
+  const onclickClearHandler = () => {
+    dispatch(clearDataAC())
+  }
 
   return (
     <AppBar position="static" sx={{ mb: "30px" }}>
@@ -38,7 +42,11 @@ export const Header = () => {
           </IconButton>
           <div>
             {isLoggedIn && <NavButton onClick={onclickLogoutHandler}>Sign out</NavButton>}
-            <NavButton background={theme.palette.primary.dark}>Faq</NavButton>
+
+            <NavButton component={Link} to="/faq" onClick={onclickClearHandler} background={theme.palette.primary.dark}>
+              Faq
+            </NavButton>
+
             <Switch color={"default"} onChange={changeMode} />
           </div>
         </Container>
