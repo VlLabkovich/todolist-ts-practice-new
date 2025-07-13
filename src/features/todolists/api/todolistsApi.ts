@@ -1,8 +1,31 @@
+import { AUTH_TOKEN } from "@/common/constants"
 import { instance } from "@/common/instance"
 import type { BaseResponse } from "@/common/types"
-import type { Todolist } from "./todolistsApi.types"
+import type { Todolist } from "@/features/todolists/api/todolistsApi.types.ts"
+import type { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
+import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 
-export const todolistsApi = {
+export const todolistsApi = createApi({
+  reducerPath: "todolistsApi",
+  baseQuery: fetchBaseQuery({
+    baseUrl: import.meta.env.VITE_BASE_URL,
+    prepareHeaders: (headers) => {
+      headers.set("API-KEY", import.meta.env.VITE_API_KEY)
+      headers.set("Authorization", `Bearer ${localStorage.getItem(AUTH_TOKEN)}`)
+    },
+  }),
+  endpoints: (build) => ({
+    getTodolists: build.query<DomainTodolist[], void>({
+      query: () => "todo-lists",
+      transformResponse: (todolists: Todolist[]): DomainTodolist[] =>
+        todolists.map((todolist) => ({ ...todolist, filter: "all", entityStatus: "idle" })),
+    }),
+  }),
+})
+
+
+
+export const _todolistsApi = {
   // 3
   getTodolists() {
     // 4
@@ -18,3 +41,5 @@ export const todolistsApi = {
     return instance.delete<BaseResponse>(`/todo-lists/${id}`)
   },
 }
+
+export const { useGetTodolistsQuery } = todolistsApi
