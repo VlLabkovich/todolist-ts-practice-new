@@ -17,13 +17,13 @@ export const todolistsApi = createApi({
   endpoints: (build) => ({
     getTodolists: build.query<DomainTodolist[], void>({
       query: () => "todo-lists",
-      transformResponse: (todolists: Todolist[]): DomainTodolist[] =>
-        todolists.map((todolist) => ({ ...todolist, filter: "all", entityStatus: "idle" })),
+      transformResponse: (todolists: Todolist[]): DomainTodolist[] => {
+        return todolists.map((todolist) => ({ ...todolist, filter: "all", entityStatus: "idle" }))
+      },
+      // debugger
     }),
   }),
 })
-
-
 
 export const _todolistsApi = {
   // 3
@@ -31,7 +31,7 @@ export const _todolistsApi = {
     // 4
     return instance.get<Todolist[]>("/todo-lists")
   },
-  changeTodolistTitle( id: string, title:string) {
+  changeTodolistTitle(id: string, title: string) {
     return instance.put<BaseResponse>(`/todo-lists/${id}`, { title })
   },
   createTodolist(title: string) {
@@ -42,4 +42,4 @@ export const _todolistsApi = {
   },
 }
 
-export const { useGetTodolistsQuery } = todolistsApi
+export const { useGetTodolistsQuery, useLazyGetTodolistsQuery } = todolistsApi

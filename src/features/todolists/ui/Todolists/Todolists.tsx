@@ -4,10 +4,20 @@ import Paper from "@mui/material/Paper"
 import { TodolistItem } from "./TodolistItem/TodolistItem"
 
 export const Todolists = () => {
+  // const [skip, setSkip] = useState(true)
+  // const { data: todolists } = useGetTodolistsQuery(undefined, { skip })
+  // const fetchTodolists = () => {
+  //   // setSkip(false)
+  // }
+  // const [trigger, { data: todolists }] = useLazyGetTodolistsQuery()
+
   const { data: todolists } = useGetTodolistsQuery()
 
   return (
     <>
+      {/*<div>*/}
+      {/*  <button onClick={() => trigger()}>Download todolists</button>*/}
+      {/*</div>*/}
       {todolists?.map((todolist) => (
         <Grid key={todolist.id}>
           <Paper sx={{ p: "0 20px 20px 20px" }}>
@@ -18,3 +28,20 @@ export const Todolists = () => {
     </>
   )
 }
+
+// Conditional fetching
+// 1
+// const [skip, setSkip] = useState(true)
+// const { data: todolists } = useGetTodolistsQuery(undefined, { skip })
+// const fetchTodolists = () => {
+//   // setSkip(false)
+// }
+// {/*<div>*/}
+// {/*  <button onClick={fetchTodolists}>Download todolists</button>*/}
+// {/*</div>*/}
+//
+// 2
+// const [trigger, { data: todolists }] = useLazyGetTodolistsQuery()
+// {/*<div>*/}
+// {/*  <button onClick={() => trigger()}>Download todolists</button>*/}
+// {/*</div>*/}
