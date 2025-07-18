@@ -12,41 +12,46 @@ export const todolistsApi = createApi({
     prepareHeaders: (headers) => {
       headers.set("API-KEY", import.meta.env.VITE_API_KEY)
       headers.set("Authorization", `Bearer ${localStorage.getItem(AUTH_TOKEN)}`)
-    },
+    }
   }),
+  tagTypes: ["Todolist"],
   endpoints: (build) => ({
     getTodolists: build.query<DomainTodolist[], void>({
       query: () => ({
         url: "/todo-lists",
-        method: "GET",
+        method: "GET"
       }),
       transformResponse: (todolists: Todolist[]): DomainTodolist[] =>
         todolists.map((todolist) => ({ ...todolist, filter: "all", entityStatus: "idle" })),
+      providesTags: ["Todolist"]
     }),
 
     createTodolist: build.mutation<BaseResponse<{ item: Todolist }>, string>({
       query: (title) => ({
         url: "/todo-lists",
         method: "POST",
-        body: { title },
+        body: { title }
       }),
+      invalidatesTags: ["Todolist"]
     }),
 
     deleteTodolist: build.mutation<BaseResponse, string>({
       query: (id) => ({
         url: `/todo-lists/${id}`,
-        method: "DELETE",
+        method: "DELETE"
       }),
+      invalidatesTags: ["Todolist"]
     }),
 
     changeTodolistTitle: build.mutation<BaseResponse, { id: string; title: string }>({
       query: ({ id, title }) => ({
         url: `/todo-lists/${id}`,
         method: "PUT",
-        body: { title },
+        body: { title }
       }),
-    }),
-  }),
+      invalidatesTags: ["Todolist"]
+    })
+  })
 })
 
 export const _todolistsApi = {
@@ -63,7 +68,7 @@ export const _todolistsApi = {
   },
   deleteTodolist(id: string) {
     return instance.delete<BaseResponse>(`/todo-lists/${id}`)
-  },
+  }
 }
 
 export const {
@@ -71,5 +76,5 @@ export const {
   useCreateTodolistMutation,
   useDeleteTodolistMutation,
   useChangeTodolistTitleMutation,
-  useLazyGetTodolistsQuery,
+  useLazyGetTodolistsQuery
 } = todolistsApi

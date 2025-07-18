@@ -23,7 +23,6 @@ export const TodolistTitle = ({ todolist }: Props) => {
       <h3>
         <EditableSpan
           value={title}
-          // onChange={(title) => changeTodolistTitle({ id, title })}
           onChange={(title) => changeTodolistTitle({ id, title })}
           disabled={todolistDisabled}
         />
