@@ -1,57 +1,47 @@
-import { AUTH_TOKEN } from "@/common/constants"
+import { baseApi } from "@/app/baseApi.ts"
 import { instance } from "@/common/instance"
 import type { BaseResponse } from "@/common/types"
 import type { Todolist } from "@/features/todolists/api/todolistsApi.types.ts"
 import type { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react"
 
-export const todolistsApi = createApi({
-  reducerPath: "todolistsApi",
-  baseQuery: fetchBaseQuery({
-    baseUrl: import.meta.env.VITE_BASE_URL,
-    prepareHeaders: (headers) => {
-      headers.set("API-KEY", import.meta.env.VITE_API_KEY)
-      headers.set("Authorization", `Bearer ${localStorage.getItem(AUTH_TOKEN)}`)
-    }
-  }),
-  tagTypes: ["Todolist"],
+export const todolistsApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
     getTodolists: build.query<DomainTodolist[], void>({
       query: () => ({
         url: "/todo-lists",
-        method: "GET"
+        method: "GET",
       }),
       transformResponse: (todolists: Todolist[]): DomainTodolist[] =>
         todolists.map((todolist) => ({ ...todolist, filter: "all", entityStatus: "idle" })),
-      providesTags: ["Todolist"]
+      providesTags: ["Todolist"],
     }),
 
     createTodolist: build.mutation<BaseResponse<{ item: Todolist }>, string>({
       query: (title) => ({
         url: "/todo-lists",
         method: "POST",
-        body: { title }
+        body: { title },
       }),
-      invalidatesTags: ["Todolist"]
+      invalidatesTags: ["Todolist"],
     }),
 
     deleteTodolist: build.mutation<BaseResponse, string>({
       query: (id) => ({
         url: `/todo-lists/${id}`,
-        method: "DELETE"
+        method: "DELETE",
       }),
-      invalidatesTags: ["Todolist"]
+      invalidatesTags: ["Todolist"],
     }),
 
     changeTodolistTitle: build.mutation<BaseResponse, { id: string; title: string }>({
       query: ({ id, title }) => ({
         url: `/todo-lists/${id}`,
         method: "PUT",
-        body: { title }
+        body: { title },
       }),
-      invalidatesTags: ["Todolist"]
-    })
-  })
+      invalidatesTags: ["Todolist"],
+    }),
+  }),
 })
 
 export const _todolistsApi = {
@@ -68,7 +58,7 @@ export const _todolistsApi = {
   },
   deleteTodolist(id: string) {
     return instance.delete<BaseResponse>(`/todo-lists/${id}`)
-  }
+  },
 }
 
 export const {
@@ -76,5 +66,5 @@ export const {
   useCreateTodolistMutation,
   useDeleteTodolistMutation,
   useChangeTodolistTitleMutation,
-  useLazyGetTodolistsQuery
+  useLazyGetTodolistsQuery,
 } = todolistsApi
