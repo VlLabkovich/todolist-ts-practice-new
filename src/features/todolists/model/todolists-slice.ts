@@ -4,7 +4,7 @@ import { ResultCode } from "@/common/enums"
 import type { RequestStatus } from "@/common/types"
 import { createAppSlice, handleServerAppError, handleServerNetworkError } from "@/common/utils"
 import { _todolistsApi } from "@/features/todolists/api/todolistsApi.ts"
-import { type Todolist, TodolistSchema } from "@/features/todolists/api/todolistsApi.types.ts"
+import { type Todolist } from "@/features/todolists/api/todolistsApi.types.ts"
 
 export type DomainTodolist = Todolist & {
   filter: FilterValues
@@ -37,28 +37,28 @@ export const todolistsSlice = createAppSlice({
       }
     }),
 
-    fetchTodolistsTC: create.asyncThunk(
-      async (_, { dispatch, rejectWithValue }) => {
-        try {
-          dispatch(setAppStatusAC({ status: "loading" }))
-          const res = await _todolistsApi.getTodolists()
-          dispatch(setAppStatusAC({ status: "succeeded" }))
-          const todolists = TodolistSchema.array().parse(res.data)
-          return { todolists }
-        } catch (error) {
-          console.log(error)
-          handleServerNetworkError(dispatch, error)
-          return rejectWithValue(null)
-        }
-      },
-      {
-        fulfilled: (state, action) => {
-          action.payload?.todolists.forEach((tl) => {
-            state.push({ ...tl, filter: "all", entityStatus: "idle" })
-          })
-        },
-      },
-    ),
+    // fetchTodolistsTC: create.asyncThunk(
+    //   async (_, { dispatch, rejectWithValue }) => {
+    //     try {
+    //       dispatch(setAppStatusAC({ status: "loading" }))
+    //       const res = await _todolistsApi.getTodolists()
+    //       dispatch(setAppStatusAC({ status: "succeeded" }))
+    //       const todolists = TodolistSchema.array().parse(res.data)
+    //       return { todolists }
+    //     } catch (error) {
+    //       console.log(error)
+    //       handleServerNetworkError(dispatch, error)
+    //       return rejectWithValue(null)
+    //     }
+    //   },
+    //   {
+    //     fulfilled: (state, action) => {
+    //       action.payload?.todolists.forEach((tl) => {
+    //         state.push({ ...tl, filter: "all", entityStatus: "idle" })
+    //       })
+    //     },
+    //   },
+    // ),
 
     changeTodolistTitleTC: create.asyncThunk(
       async (payload: { id: string; title: string }, { dispatch, rejectWithValue }) => {
@@ -145,7 +145,7 @@ export const todolistsSlice = createAppSlice({
 })
 
 export const {
-  fetchTodolistsTC,
+  // fetchTodolistsTC,
   changeTodolistTitleTC,
   deleteTodolistTC,
   createTodolistTC,

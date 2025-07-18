@@ -16,11 +16,35 @@ export const todolistsApi = createApi({
   }),
   endpoints: (build) => ({
     getTodolists: build.query<DomainTodolist[], void>({
-      query: () => "todo-lists",
-      transformResponse: (todolists: Todolist[]): DomainTodolist[] => {
-        return todolists.map((todolist) => ({ ...todolist, filter: "all", entityStatus: "idle" }))
-      },
-      // debugger
+      query: () => ({
+        url: "/todo-lists",
+        method: "GET",
+      }),
+      transformResponse: (todolists: Todolist[]): DomainTodolist[] =>
+        todolists.map((todolist) => ({ ...todolist, filter: "all", entityStatus: "idle" })),
+    }),
+
+    createTodolist: build.mutation<BaseResponse<{ item: Todolist }>, string>({
+      query: (title) => ({
+        url: "/todo-lists",
+        method: "POST",
+        body: { title },
+      }),
+    }),
+
+    deleteTodolist: build.mutation<BaseResponse, string>({
+      query: (id) => ({
+        url: `/todo-lists/${id}`,
+        method: "DELETE",
+      }),
+    }),
+
+    changeTodolistTitle: build.mutation<BaseResponse, { id: string; title: string }>({
+      query: ({ id, title }) => ({
+        url: `/todo-lists/${id}`,
+        method: "PUT",
+        body: { title },
+      }),
     }),
   }),
 })
@@ -42,4 +66,10 @@ export const _todolistsApi = {
   },
 }
 
-export const { useGetTodolistsQuery, useLazyGetTodolistsQuery } = todolistsApi
+export const {
+  useGetTodolistsQuery,
+  useCreateTodolistMutation,
+  useDeleteTodolistMutation,
+  useChangeTodolistTitleMutation,
+  useLazyGetTodolistsQuery,
+} = todolistsApi

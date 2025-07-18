@@ -1,10 +1,6 @@
 import { EditableSpan } from "@/common/components/EditableSpan/EditableSpan"
-import { useAppDispatch } from "@/common/hooks"
-import {
-  changeTodolistTitleTC,
-  deleteTodolistTC,
-  type DomainTodolist,
-} from "@/features/todolists/model/todolists-slice.ts"
+import { useChangeTodolistTitleMutation, useDeleteTodolistMutation } from "@/features/todolists/api/todolistsApi.ts"
+import { type DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
 import DeleteIcon from "@mui/icons-material/Delete"
 import IconButton from "@mui/material/IconButton"
 import styles from "./TodolistTitle.module.css"
@@ -16,26 +12,34 @@ type Props = {
 export const TodolistTitle = ({ todolist }: Props) => {
   const { id, title, entityStatus } = todolist
 
-  const dispatch = useAppDispatch()
+  const [changeTodolistTitle] = useChangeTodolistTitleMutation()
 
-  const deleteTodolist = () => {
-    dispatch(deleteTodolistTC(id))
-  }
+  const [deleteTodolist] = useDeleteTodolistMutation()
 
-  const changeTodolistTitle = (title: string) => {
-    dispatch(changeTodolistTitleTC({ id, title }))
-  }
-
-  const todolistDisabled = (entityStatus === "loading")
+  const todolistDisabled = entityStatus === "loading"
 
   return (
     <div className={styles.container}>
       <h3>
-        <EditableSpan value={title} onChange={changeTodolistTitle} disabled={todolistDisabled} />
+        <EditableSpan
+          value={title}
+          // onChange={(title) => changeTodolistTitle({ id, title })}
+          onChange={(title) => changeTodolistTitle({ id, title })}
+          disabled={todolistDisabled}
+        />
       </h3>
-      <IconButton onClick={deleteTodolist} disabled={todolistDisabled}>
+      <IconButton onClick={() => deleteTodolist(id)} disabled={todolistDisabled}>
         <DeleteIcon />
       </IconButton>
     </div>
   )
 }
+
+// const dispatch = useAppDispatch()
+//
+// const deleteTodolist = () => {
+//   dispatch(deleteTodolistTC(id))
+// }
+// const changeTodolistTitle = (title: string) => {
+//   dispatch(changeTodolistTitleTC({ id, title }))
+// }
