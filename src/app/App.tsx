@@ -1,10 +1,11 @@
-import { selectThemeMode } from "@/app/app-slice.ts"
+import { selectThemeMode, setIsLoggedInAC } from "@/app/app-slice.ts"
 import { ErrorSnackbar } from "@/common/components"
 import { Header } from "@/common/components/Header/Header"
+import { ResultCode } from "@/common/enums"
 import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { Routing } from "@/common/routing"
 import { getTheme } from "@/common/theme"
-import { initializeAppTC } from "@/features/auth/model/auth-slice.ts"
+import { useMeQuery } from "@/features/auth/api/authApi.ts"
 import { CircularProgress } from "@mui/material"
 import CssBaseline from "@mui/material/CssBaseline"
 import { ThemeProvider } from "@mui/material/styles"
@@ -20,11 +21,16 @@ export const App = () => {
 
   const dispatch = useAppDispatch()
 
+  const { data, isLoading } = useMeQuery()
+
   useEffect(() => {
-    dispatch(initializeAppTC()).finally(() => {
-      setIsInitialized(true)
-    })
-  }, [])
+    if (isLoading) return
+    setIsInitialized(true)
+
+    if (data?.resultCode === ResultCode.Success) {
+      dispatch(setIsLoggedInAC({ isLoggedIn: true }))
+    }
+  }, [isLoading])
 
   if (!isInitialized) {
     return (

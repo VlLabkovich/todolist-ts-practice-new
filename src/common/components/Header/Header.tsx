@@ -1,10 +1,18 @@
-import { changeThemeModeAC, selectStatus, selectThemeMode } from "@/app/app-slice.ts"
+import {
+  changeThemeModeAC,
+  selectIsLoggedIn,
+  selectStatus,
+  selectThemeMode,
+  setIsLoggedInAC,
+} from "@/app/app-slice.ts"
 import { clearDataAC } from "@/common/actions"
 import { NavButton } from "@/common/components/NavButton/NavButton"
+import { AUTH_TOKEN } from "@/common/constants"
+import { ResultCode } from "@/common/enums"
 import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { containerSx } from "@/common/styles"
 import { getTheme } from "@/common/theme"
-import { logoutTC, selectIsLoggedIn } from "@/features/auth/model/auth-slice.ts"
+import { useLogoutMutation } from "@/features/auth/api/authApi.ts"
 import MenuIcon from "@mui/icons-material/Menu"
 import { LinearProgress } from "@mui/material"
 import AppBar from "@mui/material/AppBar"
@@ -21,17 +29,23 @@ export const Header = () => {
   const isLoggedIn = useAppSelector(selectIsLoggedIn)
 
   const theme = getTheme(themeMode)
+
   const changeMode = () => {
     dispatch(changeThemeModeAC({ themeMode: themeMode === "light" ? "dark" : "light" }))
   }
 
-  const onclickLogoutHandler = () => {
-    dispatch(logoutTC())
-  }
+  const [logout] = useLogoutMutation()
 
-  const onclickClearHandler = () => {
-    dispatch(clearDataAC())
+  const logoutHandler = () => {
+    logout().then((res) => {
+      if (res.data?.resultCode === ResultCode.Success) {
+        localStorage.removeItem(AUTH_TOKEN)
+        dispatch(setIsLoggedInAC({ isLoggedIn: false }))
+        dispatch(clearDataAC())
+      }
+    })
   }
+  const onclickClearHandler = () =>  dispatch(clearDataAC())
 
   return (
     <AppBar position="static" sx={{ mb: "30px" }}>
@@ -41,7 +55,7 @@ export const Header = () => {
             <MenuIcon />
           </IconButton>
           <div>
-            {isLoggedIn && <NavButton onClick={onclickLogoutHandler}>Sign out</NavButton>}
+            {isLoggedIn && <NavButton onClick={logoutHandler}>Sign out</NavButton>}
 
             <NavButton component={Link} to="/faq" onClick={onclickClearHandler} background={theme.palette.primary.dark}>
               Faq

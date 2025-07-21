@@ -1,10 +1,13 @@
-import { selectThemeMode } from "@/app/app-slice"
+import { selectIsLoggedIn, selectThemeMode, setIsLoggedInAC } from "@/app/app-slice"
+import { AUTH_TOKEN } from "@/common/constants"
+import { ResultCode } from "@/common/enums"
 import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { Path } from "@/common/routing"
 import { getTheme } from "@/common/theme"
+import { useLoginMutation } from "@/features/auth/api/authApi.ts"
 import { loginSchema } from "@/features/auth/lib/schemas"
 import type { LoginInputs } from "@/features/auth/lib/schemas/loginSchema.ts"
-import { loginTC, selectIsLoggedIn } from "@/features/auth/model/auth-slice.ts"
+import { zodResolver } from "@hookform/resolvers/zod"
 import Button from "@mui/material/Button"
 import Checkbox from "@mui/material/Checkbox"
 import FormControl from "@mui/material/FormControl"
@@ -17,7 +20,6 @@ import { useEffect } from "react"
 import { Controller, type SubmitHandler, useForm } from "react-hook-form"
 import { useNavigate } from "react-router"
 import styles from "./Login.module.css"
-import { zodResolver } from "@hookform/resolvers/zod"
 
 export const Login = () => {
   const themeMode = useAppSelector(selectThemeMode)
@@ -25,6 +27,8 @@ export const Login = () => {
   const dispatch = useAppDispatch()
   const isLoggedIn = useAppSelector(selectIsLoggedIn)
   const navigate = useNavigate()
+
+  const [login] = useLoginMutation()
 
   const {
     register,
@@ -38,8 +42,13 @@ export const Login = () => {
   })
 
   const onSubmit: SubmitHandler<LoginInputs> = (data) => {
-    dispatch(loginTC(data))
-    reset()
+    login(data).then((res) => {
+      if (res.data?.resultCode === ResultCode.Success) {
+        dispatch(setIsLoggedInAC({ isLoggedIn: true }))
+        localStorage.setItem(AUTH_TOKEN, res.data.data.token)
+        reset()
+      }
+    })
   }
 
   useEffect(() => {
