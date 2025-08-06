@@ -1,10 +1,4 @@
-import {
-  changeThemeModeAC,
-  selectIsLoggedIn,
-  selectStatus,
-  selectThemeMode,
-  setIsLoggedInAC,
-} from "@/app/app-slice.ts"
+import { changeThemeModeAC, selectIsLoggedIn, selectStatus, selectThemeMode, setIsLoggedInAC } from "@/app/app-slice.ts"
 import { clearDataAC } from "@/common/actions"
 import { NavButton } from "@/common/components/NavButton/NavButton"
 import { AUTH_TOKEN } from "@/common/constants"
@@ -45,7 +39,7 @@ export const Header = () => {
       }
     })
   }
-  const onclickClearHandler = () =>  dispatch(clearDataAC())
+  const onclickClearHandler = () => dispatch(clearDataAC())
 
   return (
     <AppBar position="static" sx={{ mb: "30px" }}>
