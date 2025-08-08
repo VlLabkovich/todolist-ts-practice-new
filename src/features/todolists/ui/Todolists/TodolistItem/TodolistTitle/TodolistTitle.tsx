@@ -41,7 +41,6 @@ export const TodolistTitle = ({ todolist }: Props) => {
       .unwrap()
       .catch(() => {
         changeTodolistStatus("idle")
-        console.log('Ошибка')
       })
   }
 
