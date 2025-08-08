@@ -24,12 +24,12 @@ export const todolistsSlice = createAppSlice({
   },
 
   reducers: (create) => ({
-    changeTodolistFilterAC: create.reducer<{ id: string; filter: FilterValues }>((state, action) => {
-      const todolistFilter = state.find((todo: { id: string }) => todo.id === action.payload.id)
-      if (todolistFilter) {
-        todolistFilter.filter = action.payload.filter
-      }
-    }),
+    // changeTodolistFilterAC: create.reducer<{ id: string; filter: FilterValues }>((state, action) => {
+    //   const todolistFilter = state.find((todo: { id: string }) => todo.id === action.payload.id)
+    //   if (todolistFilter) {
+    //     todolistFilter.filter = action.payload.filter
+    //   }
+    // }),
     changeTodolistStatusAC: create.reducer<{ id: string; entityStatus: RequestStatus }>((state, action) => {
       const todolistStatus = state.findIndex((todo) => todo.id === action.payload.id)
       if (todolistStatus !== -1) {
@@ -149,7 +149,7 @@ export const {
   changeTodolistTitleTC,
   deleteTodolistTC,
   createTodolistTC,
-  changeTodolistFilterAC,
+  // changeTodolistFilterAC,
   changeTodolistStatusAC,
 } = todolistsSlice.actions
 export const { selectTodolists } = todolistsSlice.selectors

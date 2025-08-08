@@ -1,5 +1,11 @@
 import { EditableSpan } from "@/common/components/EditableSpan/EditableSpan"
-import { useChangeTodolistTitleMutation, useDeleteTodolistMutation } from "@/features/todolists/api/todolistsApi.ts"
+import { useAppDispatch } from "@/common/hooks"
+import type { RequestStatus } from "@/common/types"
+import {
+  todolistsApi,
+  useChangeTodolistTitleMutation,
+  useDeleteTodolistMutation
+} from "@/features/todolists/api/todolistsApi.ts"
 import { type DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
 import DeleteIcon from "@mui/icons-material/Delete"
 import IconButton from "@mui/material/IconButton"
@@ -11,14 +17,36 @@ type Props = {
 
 export const TodolistTitle = ({ todolist }: Props) => {
   const { id, title, entityStatus } = todolist
-
+  const dispatch = useAppDispatch()
   const [changeTodolistTitle] = useChangeTodolistTitleMutation()
 
-  const [deleteTodolist] = useDeleteTodolistMutation()
+  const [removeTodolist] = useDeleteTodolistMutation()
 
   const todolistDisabled = entityStatus === "loading"
 
-  return (
+  const changeTodolistStatus = (entityStatus: RequestStatus) => {
+    dispatch(
+      todolistsApi.util.updateQueryData("getTodolists", undefined, (state) => {
+        const todolist = state.find((todolist) => todolist.id === id)
+        if (todolist) {
+          todolist.entityStatus = entityStatus
+        }
+      }),
+    )
+  }
+
+  const deleteTodolist = () => {
+    changeTodolistStatus("loading")
+    removeTodolist(id)
+      .unwrap()
+      .catch(() => {
+        changeTodolistStatus("idle")
+        console.log('Ошибка')
+      })
+  }
+
+
+    return (
     <div className={styles.container}>
       <h3>
         <EditableSpan
@@ -27,7 +55,7 @@ export const TodolistTitle = ({ todolist }: Props) => {
           disabled={todolistDisabled}
         />
       </h3>
-      <IconButton onClick={() => deleteTodolist(id)} disabled={todolistDisabled}>
+      <IconButton onClick={deleteTodolist} disabled={todolistDisabled}>
         <DeleteIcon />
       </IconButton>
     </div>

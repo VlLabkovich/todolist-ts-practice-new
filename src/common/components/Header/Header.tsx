@@ -1,4 +1,5 @@
 import { changeThemeModeAC, selectIsLoggedIn, selectStatus, selectThemeMode, setIsLoggedInAC } from "@/app/app-slice.ts"
+import { baseApi } from "@/app/baseApi.ts"
 import { clearDataAC } from "@/common/actions"
 import { NavButton } from "@/common/components/NavButton/NavButton"
 import { AUTH_TOKEN } from "@/common/constants"
@@ -31,13 +32,18 @@ export const Header = () => {
   const [logout] = useLogoutMutation()
 
   const logoutHandler = () => {
-    logout().then((res) => {
-      if (res.data?.resultCode === ResultCode.Success) {
-        localStorage.removeItem(AUTH_TOKEN)
-        dispatch(setIsLoggedInAC({ isLoggedIn: false }))
-        dispatch(clearDataAC())
-      }
-    })
+    logout()
+      .then((res) => {
+        if (res.data?.resultCode === ResultCode.Success) {
+          localStorage.removeItem(AUTH_TOKEN)
+          dispatch(setIsLoggedInAC({ isLoggedIn: false }))
+          // dispatch(clearDataAC())
+          // dispatch(baseApi.util.resetApiState()) // зачистка всего стейта
+        }
+      })
+      .then(() => {
+        dispatch(baseApi.util.invalidateTags(["Todolist"])) // зачистка части стейта
+      })
   }
   const onclickClearHandler = () => dispatch(clearDataAC())
 
