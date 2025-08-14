@@ -18,7 +18,7 @@ export const todolistsApi = baseApi.injectEndpoints({
 
     createTodolist: build.mutation<BaseResponse<{ item: Todolist }>, string>({
       query: (title) => ({
-        url: "/todo-lists",
+        url: "/todo-lists1",
         method: "POST",
         body: { title },
       }),
