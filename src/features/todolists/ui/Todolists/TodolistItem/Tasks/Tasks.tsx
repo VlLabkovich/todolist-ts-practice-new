@@ -1,11 +1,8 @@
-import { setAppErrorAC } from "@/app/app-slice.ts"
 import { TaskStatus } from "@/common/enums"
-import { useAppDispatch } from "@/common/hooks"
 import { useGetTasksQuery } from "@/features/todolists/api/tasksApi.ts"
 import type { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
 import { TasksSkeleton } from "@/features/todolists/ui/Todolists/TodolistItem/Tasks/TasksSkeleton"
 import List from "@mui/material/List"
-import { useEffect } from "react"
 import { TaskItem } from "./TaskItem/TaskItem"
 
 type Props = {
