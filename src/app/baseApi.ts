@@ -49,9 +49,7 @@ export const baseApi = createApi({
     //   api.dispatch(setAppErrorAC({ error }))
     // }
     // debugger
-
     handleError(api, result)
-
     return result
   },
 

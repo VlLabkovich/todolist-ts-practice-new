@@ -1,8 +1,7 @@
 import { baseApi } from "@/app/baseApi.ts"
-import { instance } from "@/common/instance"
 import type { BaseResponse } from "@/common/types"
 import type { Todolist } from "@/features/todolists/api/todolistsApi.types.ts"
-import type { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
+import type { DomainTodolist } from "@/features/todolists/lib/types"
 
 export const todolistsApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
@@ -43,23 +42,6 @@ export const todolistsApi = baseApi.injectEndpoints({
     }),
   }),
 })
-
-export const _todolistsApi = {
-  // 3
-  getTodolists() {
-    // 4
-    return instance.get<Todolist[]>("/todo-lists")
-  },
-  changeTodolistTitle(id: string, title: string) {
-    return instance.put<BaseResponse>(`/todo-lists/${id}`, { title })
-  },
-  createTodolist(title: string) {
-    return instance.post<BaseResponse<{ item: Todolist }>>("/todo-lists", { title })
-  },
-  deleteTodolist(id: string) {
-    return instance.delete<BaseResponse>(`/todo-lists/${id}`)
-  },
-}
 
 export const {
   useGetTodolistsQuery,

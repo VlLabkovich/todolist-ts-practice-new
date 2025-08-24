@@ -51,7 +51,7 @@ export const appSlice = createSlice({
   },
 })
 
-export const { changeThemeModeAC, setAppStatusAC, setAppErrorAC, setIsLoggedInAC } = appSlice.actions
+export const { changeThemeModeAC, setAppErrorAC, setIsLoggedInAC } = appSlice.actions
 export const { selectThemeMode, selectStatus, selectAppError, selectIsLoggedIn } = appSlice.selectors
 export const appReducer = appSlice.reducer
 export type ThemeMode = "dark" | "light"

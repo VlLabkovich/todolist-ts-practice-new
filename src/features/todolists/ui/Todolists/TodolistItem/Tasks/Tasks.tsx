@@ -1,6 +1,6 @@
 import { TaskStatus } from "@/common/enums"
 import { useGetTasksQuery } from "@/features/todolists/api/tasksApi.ts"
-import type { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
+import type { DomainTodolist } from "@/features/todolists/lib/types"
 import { TasksSkeleton } from "@/features/todolists/ui/Todolists/TodolistItem/Tasks/TasksSkeleton"
 import List from "@mui/material/List"
 import { TaskItem } from "./TaskItem/TaskItem"
@@ -14,17 +14,7 @@ export const Tasks = ({ todolist }: Props) => {
 
   // const dispatch = useAppDispatch()
 
-  const { data, isLoading, error, isError } = useGetTasksQuery(id)
-
-  // useEffect(() => {
-  //   if (!error) return // проверка на error на undefined
-  //   if ('status' in error) {
-  //     const errMsg = 'error' in error ? error.error : JSON.stringify(error.data)
-  //     dispatch(setAppErrorAC({ error: errMsg }))
-  //   } else {
-  //     dispatch(setAppErrorAC({ error: error.message || 'Some error occurred' }))
-  //   }
-  // }, [error])
+  const { data, isLoading } = useGetTasksQuery(id)
 
   if (isLoading) {
     return <TasksSkeleton />

@@ -6,7 +6,7 @@ import {
   useChangeTodolistTitleMutation,
   useDeleteTodolistMutation
 } from "@/features/todolists/api/todolistsApi.ts"
-import { type DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
+import type { DomainTodolist } from "@/features/todolists/lib/types"
 import DeleteIcon from "@mui/icons-material/Delete"
 import IconButton from "@mui/material/IconButton"
 import styles from "./TodolistTitle.module.css"

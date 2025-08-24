@@ -1,6 +1,6 @@
 import { CreateItemForm } from "@/common/components/CreateItemForm/CreateItemForm"
 import { useCreateTaskMutation } from "@/features/todolists/api/tasksApi.ts"
-import type { DomainTodolist } from "@/features/todolists/model/todolists-slice.ts"
+import type { DomainTodolist } from "@/features/todolists/lib/types"
 import { FilterButtons } from "./FilterButtons/FilterButtons"
 
 import { Tasks } from "./Tasks/Tasks"

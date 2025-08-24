@@ -18,9 +18,3 @@ export const Main = () => {
     </Container>
   )
 }
-
-// // With AsyncThunk
-// const dispatch = useAppDispatch()
-// const createTodolist = (title: string) => {
-// dispatch(createTodolistTC(title))
-// }
