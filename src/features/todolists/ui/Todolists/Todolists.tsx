@@ -8,7 +8,10 @@ import Paper from "@mui/material/Paper"
 import { TodolistItem } from "./TodolistItem/TodolistItem"
 
 export const Todolists = () => {
-  const { data: todolists, isLoading } = useGetTodolistsQuery()
+  const { data: todolists, isLoading } = useGetTodolistsQuery(undefined, {
+    pollingInterval: 10000,
+    skipPollingIfUnfocused: true,
+  })
 
   if (isLoading) {
     return (
