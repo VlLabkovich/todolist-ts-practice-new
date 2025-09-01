@@ -1,7 +1,9 @@
 import { TaskStatus } from "@/common/enums"
 import { useGetTasksQuery } from "@/features/todolists/api/tasksApi.ts"
 import type { DomainTodolist } from "@/features/todolists/lib/types"
-import { TasksPagination } from "@/features/todolists/ui/Todolists/TodolistItem/Tasks/TasksPagination/TasksPagination.tsx"
+import {
+  TasksPagination
+} from "@/features/todolists/ui/Todolists/TodolistItem/Tasks/TasksPagination/TasksPagination.tsx"
 import { TasksSkeleton } from "@/features/todolists/ui/Todolists/TodolistItem/Tasks/TasksSkeleton"
 import List from "@mui/material/List"
 import { useState } from "react"
@@ -16,10 +18,14 @@ export const Tasks = ({ todolist }: Props) => {
 
   const [page, setPage] = useState(1)
 
-  const { data, isLoading } = useGetTasksQuery({
-    todolistId: id,
-    params: { page },
-  })
+  const shouldFetch = id !== "testId"
+
+  const { data, isLoading } = useGetTasksQuery(
+    { todolistId: id, params: { page } },
+    { skip: !shouldFetch } // skip query, createTodolist with an optimistic update
+  )
+
+
   if (isLoading) {
     return <TasksSkeleton />
   }

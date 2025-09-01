@@ -22,6 +22,26 @@ export const todolistsApi = baseApi.injectEndpoints({
         body: { title },
       }),
       invalidatesTags: ["Todolist"],
+        async onQueryStarted(title, { dispatch, queryFulfilled }) {
+          const patchResult = dispatch(
+            todolistsApi.util.updateQueryData("getTodolists", undefined, (state) => {
+              const newTodolist: DomainTodolist = {
+                id: "testId",
+                title,
+                addedDate: new Date().toISOString(),
+                order: -10,
+                filter: "all",
+                entityStatus: "idle",
+              }
+              state.unshift(newTodolist)
+            }),
+          )
+          try {
+            await queryFulfilled
+          } catch {
+            patchResult.undo()
+          }
+        },
     }),
 
     deleteTodolist: build.mutation<BaseResponse, string>({
@@ -29,6 +49,21 @@ export const todolistsApi = baseApi.injectEndpoints({
         url: `/todo-lists/${id}`,
         method: "DELETE",
       }),
+      async onQueryStarted(id, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          todolistsApi.util.updateQueryData("getTodolists", undefined, (state) => {
+            const index = state.findIndex((todolist) => todolist.id === id)
+            if (index !== -1) {
+              state.splice(index, 1)
+            }
+          }),
+        )
+        try {
+          await queryFulfilled
+        } catch {
+          patchResult.undo()
+        }
+      },
       invalidatesTags: ["Todolist"],
     }),
 
@@ -38,6 +73,19 @@ export const todolistsApi = baseApi.injectEndpoints({
         method: "PUT",
         body: { title },
       }),
+      async onQueryStarted({ id, title }, { dispatch, queryFulfilled }) {
+        const patchResult = dispatch(
+          todolistsApi.util.updateQueryData("getTodolists", undefined, (state) => {
+            const index = state.findIndex((todolist) => todolist.id === id)
+            if (index !== -1) state[index].title = title
+          }),
+        )
+        try {
+          await queryFulfilled
+        } catch {
+          patchResult.undo()
+        }
+      },
       invalidatesTags: ["Todolist"],
     }),
   }),
@@ -48,5 +96,4 @@ export const {
   useCreateTodolistMutation,
   useDeleteTodolistMutation,
   useChangeTodolistTitleMutation,
-  useLazyGetTodolistsQuery,
 } = todolistsApi
