@@ -3,14 +3,25 @@ import { tasksApi } from "@/features/todolists/api/tasksApi.ts"
 import { todolistsApi } from "@/features/todolists/api/todolistsApi.ts"
 import { createSlice, isFulfilled, isPending, isRejected } from "@reduxjs/toolkit"
 
+type AppState = {
+  captchaUrl: string | null
+  error: string | null
+  isLoggedIn: boolean
+  themeMode: ThemeMode
+  status: RequestStatus
+}
+
+const initialState: AppState = {
+  captchaUrl: null,
+  error: null,
+  isLoggedIn: false,
+  themeMode: "light",
+  status: "idle",
+}
+
 export const appSlice = createSlice({
   name: "app",
-  initialState: {
-    themeMode: "light" as ThemeMode,
-    status: "idle" as RequestStatus,
-    error: null as string | null,
-    isLoggedIn: false,
-  },
+  initialState,
   reducers: (create) => ({
     changeThemeModeAC: create.reducer<{ themeMode: ThemeMode }>((state, action) => {
       state.themeMode = action.payload.themeMode
@@ -24,7 +35,11 @@ export const appSlice = createSlice({
     setIsLoggedInAC: create.reducer<{ isLoggedIn: boolean }>((state, action) => {
       state.isLoggedIn = action.payload.isLoggedIn
     }),
+    setCaptchaUrlAC: create.reducer<{ captchaUrl: string | null }>((state, action) => {
+      state.captchaUrl = action.payload.captchaUrl
+    }),
   }),
+
   extraReducers: (builder) => {
     builder
       .addMatcher(isPending, (state, action) => {
@@ -48,10 +63,11 @@ export const appSlice = createSlice({
     selectStatus: (state) => state.status,
     selectAppError: (state) => state.error,
     selectIsLoggedIn: (state) => state.isLoggedIn,
+    selectCaptchaUrl: (state) => state.captchaUrl
   },
 })
 
-export const { changeThemeModeAC, setAppErrorAC, setIsLoggedInAC } = appSlice.actions
-export const { selectThemeMode, selectStatus, selectAppError, selectIsLoggedIn } = appSlice.selectors
+export const { changeThemeModeAC, setAppErrorAC, setIsLoggedInAC, setCaptchaUrlAC } = appSlice.actions
+export const { selectThemeMode, selectStatus, selectAppError, selectIsLoggedIn, selectCaptchaUrl } = appSlice.selectors
 export const appReducer = appSlice.reducer
 export type ThemeMode = "dark" | "light"

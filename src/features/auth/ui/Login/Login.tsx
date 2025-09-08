@@ -1,10 +1,9 @@
-import { selectIsLoggedIn, selectThemeMode, setIsLoggedInAC } from "@/app/app-slice"
+import { selectCaptchaUrl, selectIsLoggedIn, setCaptchaUrlAC, setIsLoggedInAC } from "@/app/app-slice"
 import { AUTH_TOKEN } from "@/common/constants"
 import { ResultCode } from "@/common/enums"
 import { useAppDispatch, useAppSelector } from "@/common/hooks"
 import { Path } from "@/common/routing"
-import { getTheme } from "@/common/theme"
-import { useLoginMutation } from "@/features/auth/api/authApi.ts"
+import { useGetCaptchaUrlMutation, useLoginMutation } from "@/features/auth/api/authApi.ts"
 import { loginSchema } from "@/features/auth/lib/schemas"
 import type { LoginInputs } from "@/features/auth/lib/schemas/loginSchema.ts"
 import { zodResolver } from "@hookform/resolvers/zod"
@@ -22,13 +21,16 @@ import { useNavigate } from "react-router"
 import styles from "./Login.module.css"
 
 export const Login = () => {
-  const themeMode = useAppSelector(selectThemeMode)
-  const theme = getTheme(themeMode)
   const dispatch = useAppDispatch()
   const isLoggedIn = useAppSelector(selectIsLoggedIn)
+
+  const captchaUrl = useAppSelector(selectCaptchaUrl)
+
   const navigate = useNavigate()
 
   const [login] = useLoginMutation()
+
+  const [getCaptchaUrl] = useGetCaptchaUrlMutation()
 
   const {
     register,
@@ -37,16 +39,30 @@ export const Login = () => {
     control,
     formState: { errors },
   } = useForm<LoginInputs>({
-    defaultValues: { email: "", password: "", rememberMe: false },
+    defaultValues: { email: "", password: "", rememberMe: false, captcha: "" },
     resolver: zodResolver(loginSchema),
   })
 
   const onSubmit: SubmitHandler<LoginInputs> = (data) => {
+    console.log(data)
     login(data).then((res) => {
       if (res.data?.resultCode === ResultCode.Success) {
         dispatch(setIsLoggedInAC({ isLoggedIn: true }))
         localStorage.setItem(AUTH_TOKEN, res.data.data.token)
         reset()
+        dispatch(setCaptchaUrlAC({ captchaUrl: null }))
+      } else if (res.data?.resultCode === ResultCode.CaptchaError) {
+        console.log("Captcha error", res.data?.resultCode)
+        captchaUrlHandler()
+      }
+    })
+  }
+
+  const captchaUrlHandler = () => {
+    getCaptchaUrl().then((res) => {
+      if (res) {
+        const captchaUrl = res.data?.url
+        dispatch(setCaptchaUrlAC({ captchaUrl: captchaUrl ?? null }))
       }
     })
   }
@@ -58,33 +74,14 @@ export const Login = () => {
   }, [isLoggedIn])
 
   return (
-    <Grid container justifyContent={"center"}>
+    <Grid container justifyContent={"center"} marginTop={"auto"}>
       <form onSubmit={handleSubmit(onSubmit)}>
         <FormControl>
-          <FormLabel>
-            <p>
-              To login get registered
-              <a
-                style={{ color: theme.palette.primary.main, marginLeft: "5px" }}
-                href="https://social-network.samuraijs.com"
-                target="_blank"
-                rel="noreferrer"
-              >
-                here
-              </a>
-            </p>
-            <p>or use common test account credentials:</p>
-            <p>
-              <b>Email:</b> free@samuraijs.com
-            </p>
-            <p>
-              <b>Password:</b> free
-            </p>
-          </FormLabel>
+          <FormLabel></FormLabel>
           <FormGroup>
+            <h2 style={{ textAlign: "center" }}>Login in:</h2>
             <TextField label="Email" margin="normal" error={!!errors.email} {...register("email")} />
             {errors.email && <span className={styles.errorMessage}>{errors.email.message}</span>}
-
             <TextField
               type="password"
               label="Password"
@@ -110,6 +107,9 @@ export const Login = () => {
                 />
               }
             />
+            {captchaUrl ? <img src={captchaUrl} alt={"captcha"} /> : null}
+            {captchaUrl ? <TextField type="text" label="" {...register("captcha")} /> : null}
+            <br />
             <Button type="submit" variant="contained" color="primary">
               Login
             </Button>
