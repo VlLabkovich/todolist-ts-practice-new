@@ -50,19 +50,13 @@ export const Login = () => {
         dispatch(setIsLoggedInAC({ isLoggedIn: true }))
         localStorage.setItem(AUTH_TOKEN, res.data.data.token)
         reset()
-        dispatch(setCaptchaUrlAC({ captchaUrl: null }))
       } else if (res.data?.resultCode === ResultCode.CaptchaError) {
-        console.log("Captcha error", res.data?.resultCode)
-        captchaUrlHandler()
-      }
-    })
-  }
-
-  const captchaUrlHandler = () => {
-    getCaptchaUrl().then((res) => {
-      if (res) {
-        const captchaUrl = res.data?.url
-        dispatch(setCaptchaUrlAC({ captchaUrl: captchaUrl ?? null }))
+        getCaptchaUrl().then((res) => {
+          if (res) {
+            const captchaUrl = res.data?.url
+            dispatch(setCaptchaUrlAC({ captchaUrl: captchaUrl ?? null }))
+          }
+        })
       }
     })
   }

@@ -11,7 +11,7 @@ export const todolistsApi = baseApi.injectEndpoints({
         method: "GET",
       }),
       transformResponse: (todolists: Todolist[]): DomainTodolist[] =>
-        todolists.map((todolist) => ({ ...todolist, filter: "all", entityStatus: "idle" })),
+        todolists.map((todolist) => ({ ...todolist, filter: "all"})),
       providesTags: ["Todolist"],
     }),
 
@@ -31,7 +31,6 @@ export const todolistsApi = baseApi.injectEndpoints({
                 addedDate: new Date().toISOString(),
                 order: -10,
                 filter: "all",
-                entityStatus: "idle",
               }
               state.unshift(newTodolist)
             }),

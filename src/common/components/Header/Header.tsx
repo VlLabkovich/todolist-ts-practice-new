@@ -1,4 +1,11 @@
-import { changeThemeModeAC, selectIsLoggedIn, selectStatus, selectThemeMode, setIsLoggedInAC } from "@/app/app-slice.ts"
+import {
+  changeThemeModeAC,
+  selectIsLoggedIn,
+  selectStatus,
+  selectThemeMode,
+  setCaptchaUrlAC,
+  setIsLoggedInAC,
+} from "@/app/app-slice.ts"
 import { baseApi } from "@/app/baseApi.ts"
 import { clearDataAC } from "@/common/actions"
 import { NavButton } from "@/common/components/NavButton/NavButton"
@@ -37,8 +44,7 @@ export const Header = () => {
         if (res.data?.resultCode === ResultCode.Success) {
           localStorage.removeItem(AUTH_TOKEN)
           dispatch(setIsLoggedInAC({ isLoggedIn: false }))
-          // dispatch(clearDataAC())
-          // dispatch(baseApi.util.resetApiState()) // зачистка всего стейта
+          dispatch(setCaptchaUrlAC({ captchaUrl: null }))
         }
       })
       .then(() => {

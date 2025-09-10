@@ -10,12 +10,11 @@ type Props = {
 }
 
 export const TodolistTitle = ({ todolist }: Props) => {
-  const { id, title, entityStatus } = todolist
+  const { id, title } = todolist
   const [changeTodolistTitle] = useChangeTodolistTitleMutation()
 
   const [removeTodolist] = useDeleteTodolistMutation()
 
-  const todolistDisabled = entityStatus === "loading"
 
   return (
     <div className={styles.container}>
@@ -23,10 +22,9 @@ export const TodolistTitle = ({ todolist }: Props) => {
         <EditableSpan
           value={title}
           onChange={(title) => changeTodolistTitle({ id, title })}
-          disabled={todolistDisabled}
         />
       </h3>
-      <IconButton onClick={() => removeTodolist(id)} disabled={todolistDisabled}>
+      <IconButton onClick={() => removeTodolist(id)}>
         <DeleteIcon />
       </IconButton>
     </div>
